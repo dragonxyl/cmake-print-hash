@@ -1,0 +1,33 @@
+#define __GIT_BRANCH "@CMAKE_GIT_BRANCH@"
+#define __GIT_HASH "@CMAKE_GIT_HASH@"
+
+#include <string>
+#include <memory>
+#include <stdio.h>
+
+#ifdef _WIN32
+#define PATH_SEPERATOR__ "\\"
+#else
+#define PATH_SEPERATOR__ "/"
+#endif// _WIN32
+
+
+void PrintGitVersion(const char* path = nullptr)
+{
+    std::string exe_path;
+    exe_path.reserve(100);
+    if(path)
+    {
+        exe_path = path;
+        exe_path.erase(exe_path.find_last_of(PATH_SEPERATOR__) + 1);
+    }
+    exe_path.append("git_version.log");
+    std::unique_ptr<FILE, decltype(&fclose)> git_version_file(fopen(exe_path.c_str(), "w+"), &fclose);
+    if (git_version_file)
+    {
+        fprintf(stdout, "Git branch is : %s\n", __GIT_BRANCH);
+        fprintf(git_version_file.get(), "Git branch is : %s\n", __GIT_BRANCH);
+        fprintf(stdout, "Git hash is : %s\n", __GIT_HASH);
+        fprintf(git_version_file.get(), "Git hash is : %s\n", __GIT_HASH);
+    }
+}
